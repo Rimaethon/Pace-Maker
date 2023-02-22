@@ -9,15 +9,11 @@ public class UIController : MonoBehaviour
     public GameObject pauseMenuPanel;
     public GameObject settingsPanel;
     public GameObject mainMenuButtons;
-    private Button _resumeButton;
-    private Button _exitButton;
- 
+
 
     void Start()
     {
-        // Get references to the buttons and add click listeners
-        _resumeButton.onClick.AddListener(ResumeGame);
-        _exitButton.onClick.AddListener(ExitGame);
+        // Get references to the buttons and add click listener
 
 
         // Hide the pause menu at the start of the game
