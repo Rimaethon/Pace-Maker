@@ -12,7 +12,6 @@ public class BallMovement : MonoBehaviour
     Rigidbody rb;
     Vector3 ground = new Vector3(0, -1, 0);
     public static bool ballFall;
-    float levelSpeeder=50f;
     public VisualEffect vfx;
     float step;
     float targetX;
