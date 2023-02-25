@@ -9,13 +9,15 @@ public class UIController : MonoBehaviour
     public GameObject pauseMenuPanel;
     public GameObject settingsPanel;
     public GameObject mainMenuButtons;
+    public GameObject magicOrb;
+    private MouseMovement _mouseMovementScript;
 
 
     void Start()
     {
         // Get references to the buttons and add click listeners
 
-
+        _mouseMovementScript = magicOrb.GetComponent<MouseMovement>();
         // Hide the pause menu at the start of the game
         pauseMenuPanel.SetActive(false);
         settingsPanel.SetActive(false);
@@ -31,6 +33,8 @@ public class UIController : MonoBehaviour
             {
                 pauseMenuPanel.SetActive(true);
                 mainMenuButtons.SetActive(true);
+                _mouseMovementScript.enabled = false;
+                
                 
                 Time.timeScale = 0;
             }
@@ -39,6 +43,7 @@ public class UIController : MonoBehaviour
             {
                 CloseMenu();
                 Time.timeScale = 1;
+               
             }
         }
     }
@@ -59,6 +64,7 @@ public class UIController : MonoBehaviour
     {
         pauseMenuPanel.SetActive(false);
         settingsPanel.SetActive(false);
+        _mouseMovementScript.enabled = true;
             
     }
             

@@ -8,7 +8,8 @@ using Vector3 = UnityEngine.Vector3;
 public class MouseMovement : MonoBehaviour
 {
     public Camera mainCamera;
-    public float zCoordinate = 0f; // public variable for the z coordinate
+    
+    public float zAxisMovementSpeed;
 
     private void Start()
     {
@@ -27,29 +28,56 @@ public class MouseMovement : MonoBehaviour
 
     void Update()
     {
-        // Get the mouse position
-        Vector3 mousePosition = Input.mousePosition;
-
-        // Convert the mouse position from screen space to world space
-        mousePosition.z = mainCamera.transform.position.y;
-        Vector2 worldPosition = mainCamera.ScreenToWorldPoint(mousePosition); 
-        // set the z coordinate to the public variable
-
-        // Calculate the distance between the object and the center of the circular area
-        Vector2 center = new Vector2(0,5.3f); // assuming the circular area is the parent object
-        float distance = Vector2.Distance(worldPosition, center);
-
-        // Constrain the movement of the object to the circular area
-        if (distance < 6)
+        // Get the mouse delta input
+        Vector3 mouseDelta = new Vector3(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"), 0);
+        
+        Debug.Log(mouseDelta);
+        // Check if the mouse delta input is not zero
+        if (mouseDelta != Vector3.zero)
         {
-            transform.position = new Vector3(worldPosition.x,worldPosition.y,transform.position.z);
-        }
-        else
-        {
-            Vector2 directionDistance = worldPosition - center;
-            // If the mouse is outside the circular area, move the object along the circumference of the circle
-            Vector2 direction = directionDistance.normalized;
-            transform.position = center + direction * 6;
+            
+            // Calculate the new position of the object based on the mouse delta input
+            Vector3 newPosition = transform.position + mouseDelta;
+
+            // Get the center point of the circular area
+            Vector3 center = new Vector3(0, 5.3f, transform.position.z);
+
+            // Calculate the distance between the new position and the center point of the circular area
+            float distance = Vector3.Distance(newPosition, center);
+
+            // Calculate the constrained position of the object on the circumference of the circle
+            Vector3 direction = (newPosition - center).normalized;
+            Vector3 constrainedPosition = center + direction * 5.0f;
+
+            // Check if the new position of the object is within the circular area
+            bool isWithinCircle = (distance <= 5.0f);
+
+            // Set the position of the object to the constrained position if it's outside the circular area
+            transform.position = isWithinCircle ? newPosition : constrainedPosition;
         }
     }
+
+
+
+
+
+    private void FixedUpdate()
+    {
+        // Get the current position of the object
+        Vector3 currentPosition = transform.position;
+
+        // Add to the z component of the position
+        currentPosition.z += zAxisMovementSpeed;
+
+        // Set the object's position to the updated position with unchanged y-component
+        transform.position = new Vector3(currentPosition.x, currentPosition.y, currentPosition.z);
+    }
+    private void OnCollisionEnter(Collision collision)
+    {
+        
+            GameManager.instance.IncrementScore();
+            Destroy(collision.gameObject);
+
+    }
+
 }
