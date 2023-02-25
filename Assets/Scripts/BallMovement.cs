@@ -12,7 +12,6 @@ public class BallMovement : MonoBehaviour
     Rigidbody rb;
     Vector3 ground = new Vector3(0, -1, 0);
     public static bool ballFall;
-    public VisualEffect vfx;
     float step;
     float targetX;
     [SerializeField] float boundary = 2.5f;
@@ -29,10 +28,7 @@ public class BallMovement : MonoBehaviour
 
 
 
-    public float x;
-    public float y;
-    public float z;
-    public float w;
+
     
 
     // Start is called before the first frame update
@@ -41,7 +37,6 @@ public class BallMovement : MonoBehaviour
         direction = Vector3.forward;
         rb = GetComponent<Rigidbody>();
         ballFall = false;
-        StartCoroutine(RandomizeColorVFX());
         right = transform.right;
         
 
@@ -50,8 +45,7 @@ public class BallMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        vfx.SetVector4("Color2", new Vector4(x, y, z, w));
-        vfx.SetVector4("Color", new Vector4(x, y, z, w));
+        
         if(Input.GetKeyDown(dashKeyLeft))
         {
             SetDirection(TargetDirection.left);
@@ -71,7 +65,7 @@ public class BallMovement : MonoBehaviour
     {
         Vector3 movement = direction * Time.deltaTime * speed;
         transform.position += movement / 100;
-
+    
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -93,24 +87,7 @@ public class BallMovement : MonoBehaviour
 
     //-----------------------Functions-----------------------------//
 
-
-    IEnumerator RandomizeColorVFX()
-    {
-        while (true)
-        {
-            x = Random.Range(-100f, 100f);
-            y = Random.Range(-100f, 100f);
-            z = Random.Range(-100f, 100f);
-            yield return new WaitForSeconds(1f);
-        }
-    }
     
-        
-      
-
-
-
-
 
     private void SetDirection(TargetDirection direction)
     {
