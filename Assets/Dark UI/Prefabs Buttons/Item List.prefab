@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 7182957313138193582}
   - component: {fileID: 7182957313138193583}
   - component: {fileID: 7182957313138193568}
-  - component: {fileID: 395195390}
   m_Layer: 5
   m_Name: Item List
   m_TagString: Untagged
@@ -110,21 +109,6 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &395195390
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7182957313138193570}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2b738eb40fd94c44292d345210e433bb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  buttonTemplate: {fileID: 1376377031881555637, guid: 039ed2ed24599df4dbb60e726507b4c9, type: 3}
-  buttonParent: {fileID: 7182957314035787103}
-  songsDirectory: Assets/Rimaethon/Resources/Music
 --- !u!1 &7182957313468832436
 GameObject:
   m_ObjectHideFlags: 0
@@ -236,8 +220,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 13.9196, y: -0.00006697277}
-  m_SizeDelta: {x: -23.6196, y: 140.7957}
+  m_AnchoredPosition: {x: 46.848, y: 0.00008819679}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &7182957314035787101
 MonoBehaviour:
@@ -251,8 +235,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_HorizontalFit: 0
-  m_VerticalFit: 0
+  m_HorizontalFit: 2
+  m_VerticalFit: 2
 --- !u!114 &7182957314035787102
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -273,9 +257,9 @@ MonoBehaviour:
   m_ChildAlignment: 0
   m_StartCorner: 0
   m_StartAxis: 0
-  m_CellSize: {x: 416.7, y: 132.9}
-  m_Spacing: {x: 70, y: 10.1}
-  m_Constraint: 0
+  m_CellSize: {x: 200, y: 200}
+  m_Spacing: {x: 70, y: 70}
+  m_Constraint: 1
   m_ConstraintCount: 4
 --- !u!1 &7182957314175271660
 GameObject:
@@ -526,7 +510,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 7182957313468832434}
   m_HandleRect: {fileID: 7182957313468832435}
   m_Direction: 2
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
