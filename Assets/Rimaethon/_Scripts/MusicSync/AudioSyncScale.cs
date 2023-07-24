@@ -1,45 +1,47 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+using System.Collections;
+using Rimaethon._Scripts.MusicSync;
 
-public class AudioSyncScale : AudioSyncer {
+public class AudioSyncScale : AudioSyncer 
+{
+    [SerializeField] private float beatScaleY=2f;
+    private float restScaleY=0.1f;
 
-	private IEnumerator MoveToScale(Vector3 _target)
-	{
-		Vector3 _curr = transform.localScale;
-		Vector3 _initial = _curr;
-		float _timer = 0;
 
-		while (_curr != _target)
-		{
-			_curr = Vector3.Lerp(_initial, _target, _timer / timeToBeat);
-			_timer += Time.deltaTime;
+    private IEnumerator MoveToScale(float targetY)
+    {
+        Debug.Log($"Starting scale change to {targetY}");
 
-			transform.localScale = _curr;
+        float initialY = transform.localScale.y;
+        float timeCounter = 0;
+        while (Mathf.Abs(transform.localScale.y - targetY) > 0.01f) // Comparison with a small tolerance
+        {
+            float newY = Mathf.Lerp(initialY, targetY, timeCounter / timeToBeat);
+            timeCounter += Time.deltaTime;
 
-			yield return null;
-		}
+            transform.localScale = new Vector3(transform.localScale.x, newY, transform.localScale.z);
+            yield return null;
+        }
+        transform.localScale = new Vector3(transform.localScale.x, targetY, transform.localScale.z); // Ensure exact value
+        isBeat = false;
+        Debug.Log("Finished scale change");
+    }
 
-		m_isBeat = false;
-	}
+    public override void OnUpdate()
+    {
+        base.OnUpdate();
 
-	public override void OnUpdate()
-	{
-		base.OnUpdate();
+        if (isBeat) return;
 
-		if (m_isBeat) return;
+        float newY = Mathf.Lerp(transform.localScale.y, restScaleY, restSmoothTime * Time.deltaTime);
+        transform.localScale = new Vector3(transform.localScale.x, newY, transform.localScale.z);
+    }
 
-		transform.localScale = Vector3.Lerp(transform.localScale, restScale, restSmoothTime * Time.deltaTime);
-	}
-
-	public override void OnBeat()
-	{
-		base.OnBeat();
-
-		StopCoroutine("MoveToScale");
-		StartCoroutine("MoveToScale", beatScale);
-	}
-
-	public Vector3 beatScale;
-	public Vector3 restScale;
+    public override void OnBeat()
+    {
+        base.OnBeat();
+        Debug.Log("Beat detected");
+        StopCoroutine(MoveToScale(beatScaleY));
+        StartCoroutine(MoveToScale(beatScaleY));
+    }
 }
