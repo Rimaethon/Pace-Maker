@@ -1,39 +1,32 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-
-public class AudioSpectrum : MonoBehaviour {
-    
-    
-    private void Update()
+namespace Rimaethon._Scripts.MusicSync
+{
+    public class AudioSpectrum : MonoBehaviour 
     {
-        // get the data
-        AudioListener.GetSpectrumData(m_audioSpectrum, 0, FFTWindow.Hamming);
+        private float[] audioSpectrum;
+        public static float spectrumValue { get; private set; }
 
-        // normalize the spectrum data
-        float maxVal = Mathf.Max(m_audioSpectrum);
-        for (int i = 0; i < m_audioSpectrum.Length; i++)
+        private void Start()
         {
-            m_audioSpectrum[i] /= maxVal;
+            audioSpectrum = new float[128]; 
         }
 
-        // assign spectrum value
-        if (m_audioSpectrum != null && m_audioSpectrum.Length > 0)
+        private void Update()
         {
-            spectrumValue = m_audioSpectrum[0] * 100;
+            AudioListener.GetSpectrumData(audioSpectrum, 0, FFTWindow.Hamming);
+
+            float maxVal = Mathf.Max(audioSpectrum);
+            for (int i = 0; i < audioSpectrum.Length; i++)
+            {
+                audioSpectrum[i] /= maxVal;
+            }
+
+            if (audioSpectrum != null && audioSpectrum.Length > 0)
+            {
+                spectrumValue = audioSpectrum[0] * 100;
+            }
+            Debug.Log(spectrumValue);
         }
     }
-
-
-    private void Start()
-    {
-       
-        m_audioSpectrum = new float[128];
-    }
-    
-    public static float spectrumValue {get; private set;}
-    
-    private float[] m_audioSpectrum;
-
 }
