@@ -4,40 +4,37 @@ namespace Rimaethon._Scripts.MusicSync
 {
     public class AudioSyncer : MonoBehaviour 
     {
-        [SerializeField] private float bias;
-        [SerializeField] private float timeStep;
-        public float timeToBeat;
-        public float restSmoothTime;
-
-        private float previousAudioValue;
-        private float audioValue;
-        private float timer;
-
+        protected Transform[] _childObjects;
+        internal float timeToBeat = 0.75f;
+        internal float restSmoothTime = 0.5f;
         protected bool isBeat;
 
-        public virtual void OnBeat()
+        protected void Awake()
         {
-            timer = 0;
-            isBeat = true;
-        }
-
-        public virtual void OnUpdate()
-        { 
-            previousAudioValue = audioValue;
-            audioValue = AudioSpectrum.spectrumValue;
-
-            if (previousAudioValue > bias && audioValue <= bias && timer > timeStep)
-                OnBeat();
-
-            if (previousAudioValue <= bias && audioValue > bias && timer > timeStep)
-                OnBeat();
-
-            timer += Time.deltaTime;
+            _childObjects = GetComponentsInChildren<Transform>();
         }
 
         private void Update()
         {
             OnUpdate();
+        }
+
+        protected virtual void OnUpdate()
+        { 
+            float[] spectrum = AudioSpectrum.AveragedSpectrum;
+
+            for (int i = 0; i < _childObjects.Length; i++)
+            {
+                if (spectrum[i] > 0)
+                {
+                    OnBeat(i);
+                }
+            }
+        }
+
+        protected virtual void OnBeat(int barIndex)
+        {
+            // Override in derived classes
         }
     }
 }
