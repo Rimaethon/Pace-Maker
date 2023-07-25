@@ -4,29 +4,30 @@ namespace Rimaethon._Scripts.MusicSync
 {
     public class AudioSpectrum : MonoBehaviour 
     {
-        private float[] audioSpectrum;
-        public static float spectrumValue { get; private set; }
-
-        private void Start()
-        {
-            audioSpectrum = new float[128]; 
-        }
+        private readonly float[] _audioSpectrum = new float[128];
+        public static float[] AveragedSpectrum { get; private set; } = new float[20];
 
         private void Update()
         {
-            AudioListener.GetSpectrumData(audioSpectrum, 0, FFTWindow.Hamming);
-
-            float maxVal = Mathf.Max(audioSpectrum);
-            for (int i = 0; i < audioSpectrum.Length; i++)
+            AudioListener.GetSpectrumData(_audioSpectrum, 0, FFTWindow.Hamming);
+            float maxVal = Mathf.Max(_audioSpectrum);
+            for (int i = 0; i < _audioSpectrum.Length; i++)
             {
-                audioSpectrum[i] /= maxVal;
+                _audioSpectrum[i] /= maxVal;
             }
 
-            if (audioSpectrum != null && audioSpectrum.Length > 0)
+            // Average the spectrum data
+            for (int i = 0; i < AveragedSpectrum.Length; i++)
             {
-                spectrumValue = audioSpectrum[0] * 100;
+                int start = i * 6;
+                int end = start + 6;
+                float average = 0;
+                for (int j = start; j < end; j++)
+                {
+                    average += _audioSpectrum[j];
+                }
+                AveragedSpectrum[i] = (average / 6) * 100;
             }
-            Debug.Log(spectrumValue);
         }
     }
 }
