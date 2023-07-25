@@ -18,18 +18,11 @@ namespace Rimaethon._Scripts.MusicSync
             imageComponent = GetComponent<Image>();
         }
 
-        public override void OnUpdate()
-        {
-            base.OnUpdate();
-            if (!isBeat)
-            {
-                imageComponent.color = Color.Lerp(imageComponent.color, restColor, restSmoothTime * Time.deltaTime);
-            }
-        }
+        
 
-        public override void OnBeat()
+        protected override void OnBeat(int biasIndex)
         {
-            base.OnBeat();
+            base.OnBeat(biasIndex);
             StopCoroutine(MoveToColor(beatColors[randomIndex]));
             randomIndex = Random.Range(0, beatColors.Length);
             StartCoroutine(MoveToColor(beatColors[randomIndex]));
