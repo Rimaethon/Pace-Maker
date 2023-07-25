@@ -1,47 +1,46 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using System.Collections;
 using Rimaethon._Scripts.MusicSync;
+using UnityEngine;
 
-public class AudioSyncScale : AudioSyncer 
+public class AudioSyncScale : AudioSyncer
 {
-    [SerializeField] private float beatScaleY=2f;
-    private float restScaleY=0.1f;
+    private float restScaleY = 0.1f;
+    private Coroutine[] beatCoroutines;
 
-
-    private IEnumerator MoveToScale(float targetY)
+    private void Awake()
     {
-        Debug.Log($"Starting scale change to {targetY}");
+        base.Awake();
+        beatCoroutines = new Coroutine[_childObjects.Length];
+    }
 
-        float initialY = transform.localScale.y;
+    private IEnumerator MoveToScale(Transform target, float targetY, float scaleTime)
+    {
+        float initialY = target.localScale.y;
         float timeCounter = 0;
-        while (Mathf.Abs(transform.localScale.y - targetY) > 0.01f) // Comparison with a small tolerance
-        {
-            float newY = Mathf.Lerp(initialY, targetY, timeCounter / timeToBeat);
-            timeCounter += Time.deltaTime;
 
-            transform.localScale = new Vector3(transform.localScale.x, newY, transform.localScale.z);
+        while (Mathf.Abs(target.localScale.y - targetY) > 0.01f)
+        {
+            float newY = Mathf.Lerp(initialY, targetY, timeCounter / scaleTime);
+            timeCounter += Time.deltaTime;
+            target.localScale = new Vector3(target.localScale.x, newY, target.localScale.z);
             yield return null;
         }
-        transform.localScale = new Vector3(transform.localScale.x, targetY, transform.localScale.z); // Ensure exact value
+
+        target.localScale = new Vector3(target.localScale.x, targetY, target.localScale.z);
         isBeat = false;
-        Debug.Log("Finished scale change");
     }
 
-    public override void OnUpdate()
+    protected override void OnBeat(int barIndex)
     {
-        base.OnUpdate();
+        base.OnBeat(barIndex);
 
-        if (isBeat) return;
+        Transform childToScale = _childObjects[barIndex];
+        float scaleToUse = AudioSpectrum.AveragedSpectrum[barIndex];
 
-        float newY = Mathf.Lerp(transform.localScale.y, restScaleY, restSmoothTime * Time.deltaTime);
-        transform.localScale = new Vector3(transform.localScale.x, newY, transform.localScale.z);
-    }
+        if (beatCoroutines[barIndex] != null)
+            StopCoroutine(beatCoroutines[barIndex]);
 
-    public override void OnBeat()
-    {
-        base.OnBeat();
-        Debug.Log("Beat detected");
-        StopCoroutine(MoveToScale(beatScaleY));
-        StartCoroutine(MoveToScale(beatScaleY));
+        beatCoroutines[barIndex] = StartCoroutine(MoveToScale(childToScale, scaleToUse, timeToBeat));
+        StartCoroutine(MoveToScale(childToScale, restScaleY, restSmoothTime));
     }
 }
