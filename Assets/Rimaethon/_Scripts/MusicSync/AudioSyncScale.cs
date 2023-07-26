@@ -1,46 +1,76 @@
 ﻿using System.Collections;
-using Rimaethon._Scripts.MusicSync;
 using UnityEngine;
 
-public class AudioSyncScale : AudioSyncer
+namespace Rimaethon._Scripts.MusicSync
 {
-    private float restScaleY = 0.1f;
-    private Coroutine[] beatCoroutines;
-
-    private void Awake()
+    public class AudioSyncScale : AudioSyncer
     {
-        base.Awake();
-        beatCoroutines = new Coroutine[_childObjects.Length];
-    }
+        private Coroutine[] beatUpCoroutines;
+        private Coroutine[] beatDownCoroutines;
+        private float restScaleY = 0.1f;
 
-    private IEnumerator MoveToScale(Transform target, float targetY, float scaleTime)
-    {
-        float initialY = target.localScale.y;
-        float timeCounter = 0;
-
-        while (Mathf.Abs(target.localScale.y - targetY) > 0.01f)
+        protected override void Awake()
         {
-            float newY = Mathf.Lerp(initialY, targetY, timeCounter / scaleTime);
-            timeCounter += Time.deltaTime;
-            target.localScale = new Vector3(target.localScale.x, newY, target.localScale.z);
-            yield return null;
+            base.Awake();
+            beatUpCoroutines = new Coroutine[_childObjects.Length];
+            beatDownCoroutines = new Coroutine[_childObjects.Length];
         }
 
-        target.localScale = new Vector3(target.localScale.x, targetY, target.localScale.z);
-        isBeat = false;
-    }
+        protected override void OnBeat(int barIndex)
+        {
+            Debug.Log($"AudioSyncScale: OnBeat called for bar {barIndex}");
+            base.OnBeat(barIndex);
 
-    protected override void OnBeat(int barIndex)
-    {
-        base.OnBeat(barIndex);
+            Transform childToScale = _childObjects[barIndex];
 
-        Transform childToScale = _childObjects[barIndex];
-        float scaleToUse = AudioSpectrum.AveragedSpectrum[barIndex];
+            float meanLevel = spectrumComponent.MeanLevel;
+            float peakLevel = spectrumComponent.PeakLevels[barIndex];
+            float scaleFactor = 1.2f;
 
-        if (beatCoroutines[barIndex] != null)
-            StopCoroutine(beatCoroutines[barIndex]);
+            if (meanLevel > 0)
+            {
+                scaleFactor = baseScale * (peakLevel/ meanLevel);
+            }
 
-        beatCoroutines[barIndex] = StartCoroutine(MoveToScale(childToScale, scaleToUse, timeToBeat));
-        StartCoroutine(MoveToScale(childToScale, restScaleY, restSmoothTime));
+            // Stop any ongoing scale up coroutine
+            if (beatUpCoroutines[barIndex] != null)
+                StopCoroutine(beatUpCoroutines[barIndex]);
+
+            // Start scaling up
+            beatUpCoroutines[barIndex] = StartCoroutine(MoveToScale(childToScale, scaleFactor, timeToBeat));
+
+            // Stop any ongoing scale down coroutine
+            if (beatDownCoroutines[barIndex] != null)
+                StopCoroutine(beatDownCoroutines[barIndex]);
+
+            // Start scaling down after a delay
+            beatDownCoroutines[barIndex] = StartCoroutine(MoveToScale(childToScale, restScaleY, restSmoothTime));
+        }
+
+
+        private IEnumerator MoveToScale(Transform target, float targetY, float scaleTime)
+        {
+            Debug.Log($"AudioSyncScale: Starting MoveToScale for target {target.name} to Y {targetY} over {scaleTime} seconds");
+
+            float initialY = target.localScale.y;
+            float timeCounter = 0;
+
+            while (timeCounter < scaleTime)
+            {
+                float newY = Mathf.Lerp(initialY, targetY, timeCounter / scaleTime);
+                timeCounter += Time.deltaTime;
+                target.localScale = new Vector3(1, newY, 1);
+
+                Debug.Log($"AudioSyncScale: In MoveToScale for target {target.name}, timeCounter: {timeCounter}, newY: {newY}");
+
+                yield return null;
+            }
+
+            target.localScale = new Vector3(1, targetY, 1);
+            isBeat = false;
+
+            Debug.Log($"AudioSyncScale: Finished MoveToScale for target {target.name}");
+        }
+
     }
 }
