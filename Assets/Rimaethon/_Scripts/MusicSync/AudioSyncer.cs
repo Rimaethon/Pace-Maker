@@ -1,17 +1,29 @@
-﻿using UnityEngine;
+﻿using System.Linq;
+using UnityEngine;
 
 namespace Rimaethon._Scripts.MusicSync
 {
+    using UnityEngine;
+
+    [RequireComponent(typeof(AudioSpectrum))]
     public class AudioSyncer : MonoBehaviour 
     {
         protected Transform[] _childObjects;
-        internal float timeToBeat = 0.75f;
-        internal float restSmoothTime = 0.5f;
+        protected float timeToBeat = 0.4f;
+        protected float restSmoothTime = 0.7f;
         protected bool isBeat;
+        protected float baseScale = 3.0f;
+        protected float scaleFactor = 1.0f;
+        
 
-        protected void Awake()
+        protected AudioSpectrum spectrumComponent;
+
+        protected virtual void Awake()
         {
-            _childObjects = GetComponentsInChildren<Transform>();
+            _childObjects = GetComponentsInChildren<Transform>().Where(t => t != transform).ToArray();
+        
+            // Get the AudioSpectrum component
+            spectrumComponent = GetComponent<AudioSpectrum>();
         }
 
         private void Update()
@@ -21,20 +33,31 @@ namespace Rimaethon._Scripts.MusicSync
 
         protected virtual void OnUpdate()
         { 
-            float[] spectrum = AudioSpectrum.AveragedSpectrum;
+            float[] spectrum = spectrumComponent.Levels;
 
-            for (int i = 0; i < _childObjects.Length; i++)
+            for (int i = 0; i < spectrum.Length; i++)
             {
                 if (spectrum[i] > 0)
                 {
                     OnBeat(i);
                 }
             }
+
         }
 
         protected virtual void OnBeat(int barIndex)
         {
-            // Override in derived classes
+            float meanLevel = spectrumComponent.MeanLevel;
+            float level = spectrumComponent.Levels[barIndex];
+
+            if (meanLevel > 0)
+            {
+                scaleFactor = baseScale * (level / meanLevel);
+            }
+
+            Transform child = _childObjects[barIndex];
+            child.localScale = Vector3.one * scaleFactor;
         }
     }
+
 }
