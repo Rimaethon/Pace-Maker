@@ -55,8 +55,8 @@ namespace Rimaethon._Scripts.MusicSync
                 scaleFactor = baseScale * (level / meanLevel);
             }
 
-            Transform child = _childObjects[barIndex];
-            child.localScale = Vector3.one * scaleFactor;
+            //Transform child = _childObjects[barIndex];
+            //child.localScale = Vector3.one * scaleFactor;
         }
     }
 

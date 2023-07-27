@@ -23,15 +23,9 @@ namespace Rimaethon._Scripts.MusicSync
 
             Transform childToScale = _childObjects[barIndex];
 
-            float meanLevel = spectrumComponent.MeanLevel;
-            float peakLevel = spectrumComponent.PeakLevels[barIndex];
-            float scaleFactor = 1.2f;
+            float scaleFactor = 1f;
 
-            if (meanLevel > 0)
-            {
-                scaleFactor = baseScale * (peakLevel/ meanLevel);
-            }
-
+           
             // Stop any ongoing scale up coroutine
             if (beatUpCoroutines[barIndex] != null)
                 StopCoroutine(beatUpCoroutines[barIndex]);
