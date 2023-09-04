@@ -1,9 +1,6 @@
-using System;
 using Rimaethon._Scripts.Core.Enums;
 using Rimaethon._Scripts.Utility;
-using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace UI
 {
@@ -11,10 +8,14 @@ namespace UI
     {
         private AudioSource _audioSource;
 
+        private void Awake()
+        {
+            _audioSource = GetComponent<AudioSource>();
+        }
+
         private void OnEnable()
         {
             EventManager.Instance.AddHandler<float>(GameEvents.OnVolumeChange, UpdateVolume);
-
         }
 
         private void OnDisable()
@@ -22,16 +23,10 @@ namespace UI
             EventManager.Instance.RemoveHandler<float>(GameEvents.OnVolumeChange, UpdateVolume);
         }
 
-        private void Awake()
-        {
-            _audioSource = GetComponent<AudioSource>();
-        }
-        
-        
-        void UpdateVolume(float volume)
+
+        private void UpdateVolume(float volume)
         {
             _audioSource.volume = volume;
         }
-        
     }
 }
