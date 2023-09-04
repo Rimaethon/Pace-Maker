@@ -1,14 +1,13 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class RectangleSpawner : MonoBehaviour
 {
-    ObjectPooler objectPooler;
-    float z=0;
-    float y = 5.31f;
-    float spawnCount;
-    
+    private ObjectPooler objectPooler;
+    private float spawnCount;
+    private readonly float y = 5.31f;
+    private float z;
+
     private void Start()
     {
         objectPooler = ObjectPooler.Instance;
@@ -16,31 +15,20 @@ public class RectangleSpawner : MonoBehaviour
     }
 
 
-
-
-    IEnumerator NextPlacement()
+    private IEnumerator NextPlacement()
     {
         while (true)
-        {
-            if(spawnCount<3)
+            if (spawnCount < 3)
             {
-                
                 objectPooler.SpawnFromPool("Rectangle", new Vector3(0, y, z), Quaternion.identity);
                 spawnCount++;
                 z += 25f;
             }
             else
             {
-                
                 yield return new WaitForSeconds(8f);
                 objectPooler.SpawnFromPool("Rectangle", new Vector3(0, y, z), Quaternion.identity);
                 z += 25f;
             }
-            
-            
-           
-            
-            
-        }
     }
 }

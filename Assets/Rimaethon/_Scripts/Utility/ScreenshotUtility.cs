@@ -1,79 +1,76 @@
 ﻿/*
- *           ~~ Screenshot Utility ~~ 
+ *           ~~ Screenshot Utility ~~
  *  Takes a screenshot of the game window with its
- *  current resolution. Should work in the editor 
+ *  current resolution. Should work in the editor
  *  or on any platform.
- *  
+ *
  *  Created by Brian Winn, Michigan State University
  *  Games for Entertainment and Learning (GEL) Lab
- * 
+ *
  *  Notes:
  *    - Images are stored in a Screenshots folder within the Unity project directory.
- * 
+ *
  *    - Images will be copied over if player prefs are reset!
- * 
+ *
  *    - If the resolution is 1024x768, and the scale factor
  *      is 2, the screenshot will be saved as 2048x1536.
- * 
+ *
  *    - The mouse is not captured in the screenshot.
- * 
+ *
  * Last Updated: January 1, 2021
  */
 
+using System.IO;
 using UnityEngine;
-using System.Collections;
-using System.IO; // included for access to File IO such as Directory class
+
+// included for access to File IO such as Directory class
 
 /// <summary>
-/// Handles taking a screenshot of the game.
+///     Handles taking a screenshot of the game.
 /// </summary>
 public class ScreenshotUtility : MonoBehaviour
 {
+    #region Constants
+
+    // The key used to get/set the number of images
+    private const string ImageCntKey = "IMAGE_CNT";
+
+    #endregion
+
     // static reference to ScreenshotUtility so can be called from other scripts directly (not just through gameobject component)
     public static ScreenshotUtility screenShotUtility;
 
-    #region Public Variables
-    [Header("Settings")]
-    [Tooltip("Should the screenshot utility run only in the editor.")]
-    public bool runOnlyInEditor = true;
-    [Tooltip("What key is mapped to take the screenshot.")]
-    public string m_ScreenshotKey = "c";
-    [Tooltip("What is the scale factor for the screenshot. Standard is 1, 2x size is 2, etc..")]
-    public int m_ScaleFactor = 1;
-    [Tooltip("Include image size in filename.")]
-    public bool includeImageSizeInFilename = true;
-    #endregion
-
     [Header("Private Variables")]
+
     #region Private Variables
+
     // The number of screenshots taken
     [Tooltip("Use the Reset Counter contextual menu item to reset this.")]
     [SerializeField]
-    private int m_ImageCount = 0;
-    #endregion
+    private int m_ImageCount;
 
-    #region Constants
-    // The key used to get/set the number of images
-    private const string ImageCntKey = "IMAGE_CNT";
     #endregion
 
     /// <summary>
-    /// This sets up the screenshot utility and allows it to persist through scenes.
+    ///     This sets up the screenshot utility and allows it to persist through scenes.
     /// </summary>
-    void Awake()
+    private void Awake()
     {
         if (screenShotUtility != null)
-        { // this gameobject must already have been setup in a previous scene, so just destroy this game object
-            Destroy(this.gameObject);
+        {
+            // this gameobject must already have been setup in a previous scene, so just destroy this game object
+            Destroy(gameObject);
         }
         else if (runOnlyInEditor && !Application.isEditor)
-        { // chose not to work if this is running outside the editor so destroy it
-            Destroy(this.gameObject);
+        {
+            // chose not to work if this is running outside the editor so destroy it
+            Destroy(gameObject);
         }
         else
-        { // this is the first time we are setting up the screenshot utility
-          // setup reference to ScreenshotUtility class
-            screenShotUtility = this.GetComponent<ScreenshotUtility>();
+        {
+            // this is the first time we are setting up the screenshot utility
+            // setup reference to ScreenshotUtility class
+            screenShotUtility = GetComponent<ScreenshotUtility>();
 
             // keep this gameobject around as new scenes load
             DontDestroyOnLoad(gameObject);
@@ -82,27 +79,21 @@ public class ScreenshotUtility : MonoBehaviour
             m_ImageCount = PlayerPrefs.GetInt(ImageCntKey);
 
             // if there is not a "Screenshots" directory in the Project folder, create one
-            if (!Directory.Exists("Screenshots"))
-            {
-                Directory.CreateDirectory("Screenshots");
-            }
+            if (!Directory.Exists("Screenshots")) Directory.CreateDirectory("Screenshots");
         }
     }
 
     /// <summary>
-    /// Called once per frame. Handles the input to do TakeScreenshot action.
+    ///     Called once per frame. Handles the input to do TakeScreenshot action.
     /// </summary>
-    void Update()
-    { 
-        
-        if (Input.GetKeyDown(m_ScreenshotKey.ToLower()))
-        {
-            TakeScreenshot();
-        }
+    private void Update()
+    {
+        if (Input.GetKeyDown(m_ScreenshotKey.ToLower())) TakeScreenshot();
     }
 
     /// <summary>
-    /// This function will reset the screenshot image counter used in the filename. The function is available through the context menu on the component in the inspector.
+    ///     This function will reset the screenshot image counter used in the filename. The function is available through the
+    ///     context menu on the component in the inspector.
     /// </summary>
     [ContextMenu("Reset Counter")]
     public void ResetCounter()
@@ -114,7 +105,7 @@ public class ScreenshotUtility : MonoBehaviour
     }
 
     /// <summary>
-    /// Take the screenshot and save the PNG file to disk in the Screenshot folder of the project.
+    ///     Take the screenshot and save the PNG file to disk in the Screenshot folder of the project.
     /// </summary>
     public void TakeScreenshot()
     {
@@ -122,19 +113,32 @@ public class ScreenshotUtility : MonoBehaviour
         PlayerPrefs.SetInt(ImageCntKey, ++m_ImageCount);
 
         // Adjusts the height and width for the file name
-        int width = Screen.width * m_ScaleFactor;
-        int height = Screen.height * m_ScaleFactor;
+        var width = Screen.width * m_ScaleFactor;
+        var height = Screen.height * m_ScaleFactor;
 
         // Determine the pathname/filename for the file
-        string pathname = "Screenshots/Screenshot_";
-        if (includeImageSizeInFilename)
-        {
-            pathname += width + "x" + height + "_";
-        }
+        var pathname = "Screenshots/Screenshot_";
+        if (includeImageSizeInFilename) pathname += width + "x" + height + "_";
         pathname += m_ImageCount + ".png";
 
         // Take the actual screenshot and save it
         ScreenCapture.CaptureScreenshot(pathname, m_ScaleFactor);
         Debug.Log("Screenshot captured at " + pathname);
     }
+
+    #region Public Variables
+
+    [Header("Settings")] [Tooltip("Should the screenshot utility run only in the editor.")]
+    public bool runOnlyInEditor = true;
+
+    [Tooltip("What key is mapped to take the screenshot.")]
+    public string m_ScreenshotKey = "c";
+
+    [Tooltip("What is the scale factor for the screenshot. Standard is 1, 2x size is 2, etc..")]
+    public int m_ScaleFactor = 1;
+
+    [Tooltip("Include image size in filename.")]
+    public bool includeImageSizeInFilename = true;
+
+    #endregion
 }

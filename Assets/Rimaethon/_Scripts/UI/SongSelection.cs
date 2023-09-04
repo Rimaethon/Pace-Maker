@@ -11,33 +11,29 @@ namespace Rimaethon._Scripts.UI
         [SerializeField] private string songsDirectory;
 
 
-        void Start()
+        private void Start()
         {
             LoadSongs();
         }
 
         private void LoadSongs()
         {
-            AudioClip[] audioClips = Resources.LoadAll<AudioClip>(songsDirectory);
+            var audioClips = Resources.LoadAll<AudioClip>(songsDirectory);
 
-            foreach (AudioClip audioClip in audioClips)
+            foreach (var audioClip in audioClips)
             {
-                GameObject buttonGO = Instantiate(buttonTemplate, buttonParent);
+                var buttonGO = Instantiate(buttonTemplate, buttonParent);
                 buttonGO.SetActive(true);
                 Debug.Log("Button instantiated");
                 buttonGO.name = audioClip.name + "Button";
 
-                TMP_Text buttonText = buttonGO.GetComponentInChildren<TMP_Text>();
+                var buttonText = buttonGO.GetComponentInChildren<TMP_Text>();
                 buttonText.text = audioClip.name;
 
-                Button button = buttonGO.GetComponent<Button>();
-                
-                button.onClick.AddListener(delegate
-                {
-                    PlayerPrefs.SetString("SelectedSong", audioClip.name);
-                });
-            }
+                var button = buttonGO.GetComponent<Button>();
 
+                button.onClick.AddListener(delegate { PlayerPrefs.SetString("SelectedSong", audioClip.name); });
+            }
         }
     }
 }

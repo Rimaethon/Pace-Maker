@@ -1,8 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
+using Rimaethon._Scripts.Player;
 using UnityEngine;
-using UnityEngine.Serialization;
-using UnityEngine.UI;
 
 public class UIController : MonoBehaviour
 {
@@ -13,17 +10,17 @@ public class UIController : MonoBehaviour
     private MouseMovement _mouseMovementScript;
 
 
-    void Start()
+    private void Start()
     {
         // Get references to the buttons and add click listeners
 
         _mouseMovementScript = magicOrb.GetComponent<MouseMovement>();
         // Hide the pause menu at the start of the game
         pauseMenuPanel.SetActive(false);
-        settingsPanel.SetActive(false);
+        //settingsPanel.SetActive(false);
     }
 
-    void Update()
+    private void Update()
     {
         // Check for the Escape key to be pressed
         if (Input.GetKeyDown(KeyCode.Escape))
@@ -34,8 +31,8 @@ public class UIController : MonoBehaviour
                 pauseMenuPanel.SetActive(true);
                 mainMenuButtons.SetActive(true);
                 _mouseMovementScript.enabled = false;
-                
-                
+
+
                 Time.timeScale = 0;
             }
             // If the pause menu is active, hide it and resume the game
@@ -43,7 +40,6 @@ public class UIController : MonoBehaviour
             {
                 CloseMenu();
                 Time.timeScale = 1;
-               
             }
         }
     }
@@ -53,7 +49,7 @@ public class UIController : MonoBehaviour
         CloseMenu();
         Time.timeScale = 1;
     }
-    
+
 
     public void ExitGame()
     {
@@ -65,8 +61,5 @@ public class UIController : MonoBehaviour
         pauseMenuPanel.SetActive(false);
         settingsPanel.SetActive(false);
         _mouseMovementScript.enabled = true;
-            
     }
-            
-    
 }
