@@ -2,30 +2,32 @@ using System.Globalization;
 using System.IO;
 using UnityEngine;
 
-namespace Rimaethon._Scripts
+namespace Rimaethon._Scripts.Utility
 {
     public class LoadPositions : MonoBehaviour
     {
-        public GameObject prefab;
         private const string Filename = "recorded_positions.txt";
+        [SerializeField] private GameObject prefab;
 
-        void Start()
+        private void Start()
         {
             LoadRecordedPositions();
+            Debug.Log("Positions loaded");
         }
-        
+
         private void LoadRecordedPositions()
         {
-            string filePath = Path.Combine(Application.dataPath, Filename);
+            var filePath = Path.Combine(Application.dataPath, Filename);
             if (File.Exists(filePath))
             {
-                string[] lines = File.ReadAllLines(filePath);
-                foreach (string line in lines)
+                var lines = File.ReadAllLines(filePath);
+                foreach (var line in lines)
                 {
-                    string[] elements = line.Split(',');
-                    if (elements.Length == 3 && TryParseVector3(elements, out Vector3 position))
+                    var elements = line.Split(',');
+                    if (elements.Length == 3 && TryParseVector3(elements, out var position))
                     {
                         InstantiatePrefabAtPosition(prefab, position);
+                        Debug.Log("Object instansiated at position: " + position);
                     }
                 }
             }
@@ -34,18 +36,19 @@ namespace Rimaethon._Scripts
                 Debug.LogWarning("File not found: " + filePath);
             }
         }
-        
+
         private bool TryParseVector3(string[] elements, out Vector3 position)
         {
             position = Vector3.zero;
             if (elements.Length == 3 &&
-                float.TryParse(elements[0], NumberStyles.Float, CultureInfo.InvariantCulture, out float x) &&
-                float.TryParse(elements[1], NumberStyles.Float, CultureInfo.InvariantCulture, out float y) &&
-                float.TryParse(elements[2], NumberStyles.Float, CultureInfo.InvariantCulture, out float z))
+                float.TryParse(elements[0], NumberStyles.Float, CultureInfo.InvariantCulture, out var x) &&
+                float.TryParse(elements[1], NumberStyles.Float, CultureInfo.InvariantCulture, out var y) &&
+                float.TryParse(elements[2], NumberStyles.Float, CultureInfo.InvariantCulture, out var z))
             {
                 position = new Vector3(x, y, z);
                 return true;
             }
+
             return false;
         }
 
