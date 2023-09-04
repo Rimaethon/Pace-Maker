@@ -1,53 +1,38 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
 public class RecordPosition : MonoBehaviour
 {
-    private List<Vector3> _positions;
-    private const float RecordInterval = 0.01f;
-    private float _recordTimer;
-
     private const string Filename = "recorded_positions.txt";
+    private List<Vector3> _positions;
 
-    void Start()
+    private void Start()
     {
         _positions = new List<Vector3>();
         LoadRecordedPositions();
     }
 
-    void Update()
+    private void Update()
     {
-        _recordTimer += Time.deltaTime;
-        if (_recordTimer >= RecordInterval)
-        {
-            _recordTimer = 0f;
-            Record();
-        }
+        if (Input.GetKeyDown(KeyCode.Space)) Record();
 
-        if (Input.GetKeyDown(KeyCode.H))
-        {
-            Save();
-        }
+        if (Input.GetKeyDown(KeyCode.H)) Save();
     }
 
-    void Record()
+    private void Record()
     {
-        // Add current position to list
+        // Add current position to list only when Space button is pressed
         _positions.Add(transform.position);
     }
 
-    public void Save()
+    private void Save()
     {
-        string filePath = Path.Combine(Application.dataPath, Filename);
+        var filePath = Path.Combine(Application.dataPath, Filename);
 
-        using (StreamWriter writer = new StreamWriter(filePath))
+        using (var writer = new StreamWriter(filePath))
         {
-            foreach (Vector3 position in _positions)
-            {
-                writer.WriteLine(position.x + "," + position.y + "," + position.z);
-            }
+            foreach (var position in _positions) writer.WriteLine(position.x + "," + position.y + "," + position.z);
         }
 
         Debug.Log("Recorded positions saved to file: " + filePath);
@@ -55,23 +40,24 @@ public class RecordPosition : MonoBehaviour
 
     private void LoadRecordedPositions()
     {
-        string filePath = Path.Combine(Application.dataPath, Filename);
+        var filePath = Path.Combine(Application.dataPath, Filename);
 
         if (File.Exists(filePath))
         {
-            string[] lines = File.ReadAllLines(filePath);
+            var lines = File.ReadAllLines(filePath);
             _positions = new List<Vector3>();
-            foreach (string line in lines)
+            foreach (var line in lines)
             {
-                string[] components = line.Split(',');
+                var components = line.Split(',');
                 if (components.Length == 3)
                 {
-                    float x = float.Parse(components[0]);
-                    float y = float.Parse(components[1]);
-                    float z = float.Parse(components[2]);
+                    var x = float.Parse(components[0]);
+                    var y = float.Parse(components[1]);
+                    var z = float.Parse(components[2]);
                     _positions.Add(new Vector3(x, y, z));
                 }
             }
+
             Debug.Log("Recorded positions loaded from file: " + filePath);
         }
     }
