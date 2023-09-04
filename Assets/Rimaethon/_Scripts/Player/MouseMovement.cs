@@ -1,83 +1,74 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Numerics;
 using UnityEngine;
-using Vector2 = UnityEngine.Vector2;
-using Vector3 = UnityEngine.Vector3;
-public class MouseMovement : MonoBehaviour
+
+namespace Rimaethon._Scripts.Player
 {
-    public Camera mainCamera;
-    
-    public float zAxisMovementSpeed;
-
-    private void Start()
+    public class MouseMovement : MonoBehaviour
     {
-        Cursor.visible = false;
-    }
+        [SerializeField]
+        private Camera mainCamera;
 
-    private void OnEnable()
-    {
-        Cursor.visible = true;
-    }
+        [SerializeField]
+        private float zAxisMovementSpeed;
 
-    private void OnDisable()
-    {
-        Cursor.visible = false;
-    }
-
-    void Update()
-    {
-        // Get the mouse delta input
-        Vector3 mouseDelta = new Vector3(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"), 0);
-        
-        Debug.Log(mouseDelta);
-        // Check if the mouse delta input is not zero
-        if (mouseDelta != Vector3.zero)
+        private void Start()
         {
-            
-            // Calculate the new position of the object based on the mouse delta input
-            Vector3 newPosition = transform.position + mouseDelta;
+            InitializeSettings();
+        }
 
-            // Get the center point of the circular area
-            Vector3 center = new Vector3(0, 5.3f, transform.position.z);
+        private void Update()
+        {
+            HandleMouseMovement();
+        }
 
-            // Calculate the distance between the new position and the center point of the circular area
-            float distance = Vector3.Distance(newPosition, center);
+        private void FixedUpdate()
+        {
+            MoveAlongZAxis();
+        }
 
-            // Calculate the constrained position of the object on the circumference of the circle
-            Vector3 direction = (newPosition - center).normalized;
-            Vector3 constrainedPosition = center + direction * 5.0f;
+        private void OnCollisionEnter(Collision collision)
+        {
+            HandleCollision(collision.gameObject);
+        }
 
-            // Check if the new position of the object is within the circular area
-            bool isWithinCircle = (distance <= 5.0f);
+        private void InitializeSettings()
+        {
+            Cursor.visible = false;
+        }
 
-            // Set the position of the object to the constrained position if it's outside the circular area
-            transform.position = isWithinCircle ? newPosition : constrainedPosition;
+        private void HandleMouseMovement()
+        {
+            var mouseDelta = new Vector3(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"), 0);
+
+            if (mouseDelta != Vector3.zero)
+            {
+                Vector3 newPosition = CalculateNewPosition(mouseDelta);
+                transform.position = newPosition;
+            }
+        }
+
+        private Vector3 CalculateNewPosition(Vector3 mouseDelta)
+        {
+            var newPosition = transform.position + mouseDelta;
+
+            var center = new Vector3(0, 5.3f, transform.position.z);
+            var distance = Vector3.Distance(newPosition, center);
+            var direction = (newPosition - center).normalized;
+            var constrainedPosition = center + direction * 5.0f;
+
+            return distance <= 5.0f ? newPosition : constrainedPosition;
+        }
+
+        private void MoveAlongZAxis()
+        {
+            var currentPosition = transform.position;
+            currentPosition.z += zAxisMovementSpeed;
+            transform.position = currentPosition;
+        }
+
+        private void HandleCollision(GameObject other)
+        {
+            GameManager.instance.IncrementScore();
+            Destroy(other);
         }
     }
-
-
-
-
-
-    private void FixedUpdate()
-    {
-        // Get the current position of the object
-        Vector3 currentPosition = transform.position;
-
-        // Add to the z component of the position
-        currentPosition.z += zAxisMovementSpeed;
-
-        // Set the object's position to the updated position with unchanged y-component
-        transform.position = new Vector3(currentPosition.x, currentPosition.y, currentPosition.z);
-    }
-    private void OnCollisionEnter(Collision collision)
-    {
-        
-            GameManager.instance.IncrementScore();
-            Destroy(collision.gameObject);
-
-    }
-
 }
