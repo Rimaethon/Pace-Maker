@@ -5,6 +5,8 @@ namespace Rimaethon._Scripts.Core.Enums
         OnPlayingAudio,
         OnVolumeChange,
         OnSceneChange,
-        OnPageChange
+        OnPageChange,
+        OnTogglePause,
+        OnButtonHover
     }
 }

@@ -2,52 +2,51 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class GameManager : MonoBehaviour
+namespace Rimaethon._Scripts.Managers
 {
-    public static GameManager instance;
-    public Text score;
-    public Text countdownText;
-    private bool isCountdownMade;
-
-    private int scoreCount;
-
-    private void Awake()
+    public class GameManager : MonoBehaviour
     {
-        if (instance != null && instance != this) Destroy(this.gameObject);
-        else instance = this;
-        StartCoroutine(FreezeGameWithCountdown());
+        public Text score;
+        public Text countdownText;
+        private bool isCountdownMade;
 
-    }
+        private int scoreCount;
 
-    private void Update()
-    {
-        score.text = "Score: " + scoreCount;
-    }
+    
 
-    public void IncrementScore()
-    {
-        scoreCount++;
-    }
-
-    IEnumerator FreezeGameWithCountdown()
-    {
-        Time.timeScale = 0f; // Freezing the game
-
-        countdownText.gameObject.SetActive(true);
-
-        // Countdown from 5 to 1
-        for (int i = 5; i > 0; i--)
+    
+        private void Awake()
         {
-            countdownText.text = i.ToString();
-            yield return new WaitForSecondsRealtime(1);
+            StartCoroutine(FreezeGameWithCountdown());
         }
 
-        // Show "Start" text
-        countdownText.text = "Start!";
-        yield return new WaitForSecondsRealtime(1); // Keep it on screen for 1 second
+        private void Update()
+        {
+            score.text = "Score: " + scoreCount;
+        }
 
-        // Hide countdown text and resume game
-        countdownText.gameObject.SetActive(false);
-        Time.timeScale = 1f; // Resuming the game
+        public void IncrementScore()
+        {
+            scoreCount++;
+        }
+
+        IEnumerator FreezeGameWithCountdown()
+        {
+            Time.timeScale = 0f; 
+
+            countdownText.gameObject.SetActive(true);
+
+            for (int i = 5; i > 0; i--)
+            {
+                countdownText.text = i.ToString();
+                yield return new WaitForSecondsRealtime(1);
+            }
+
+            countdownText.text = "Start!";
+            yield return new WaitForSecondsRealtime(1); 
+
+            countdownText.gameObject.SetActive(false);
+            Time.timeScale = 1f; 
+        }
     }
 }
