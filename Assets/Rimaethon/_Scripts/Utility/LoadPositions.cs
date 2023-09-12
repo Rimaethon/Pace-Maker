@@ -1,13 +1,15 @@
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Rimaethon._Scripts.Utility
 {
     public class LoadPositions : MonoBehaviour
     {
         private const string Filename = "recorded_positions.txt";
-        [SerializeField] private GameObject prefab;
+        [SerializeField] private List<GameObject> prefabs;
 
         private void Start()
         {
@@ -26,7 +28,8 @@ namespace Rimaethon._Scripts.Utility
                     var elements = line.Split(',');
                     if (elements.Length == 3 && TryParseVector3(elements, out var position))
                     {
-                        InstantiatePrefabAtPosition(prefab, position);
+      
+                        InstantiatePrefabAtPosition(prefabs[Random.Range(0, prefabs.Count)], position);
                         Debug.Log("Object instansiated at position: " + position);
                     }
                 }
