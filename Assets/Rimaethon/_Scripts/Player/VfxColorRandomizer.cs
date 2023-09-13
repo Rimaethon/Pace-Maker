@@ -4,34 +4,35 @@ using UnityEngine.VFX;
 
 public class VfxColorRandomizer : MonoBehaviour
 {
-    public float x;
-    public float y;
-    public float z;
-    public float w;
+    private Vector4 _colorVector;
+    private VisualEffect _vfx;
 
-    public VisualEffect vfx;
-
-    // Start is called before the first frame update
     private void Start()
     {
+        _vfx = GetComponent<VisualEffect>();
+        _colorVector = new Vector4();
         StartCoroutine(RandomizeColorVFX());
     }
 
-    // Update is called once per frame
     private void Update()
     {
-        vfx.SetVector4("Color2", new Vector4(x, y, z, w));
-        vfx.SetVector4("Color", new Vector4(x, y, z, w));
+        SetVFXColor();
     }
 
     private IEnumerator RandomizeColorVFX()
     {
         while (true)
         {
-            x = Random.Range(-100f, 100f);
-            y = Random.Range(-100f, 100f);
-            z = Random.Range(-100f, 100f);
+            _colorVector.x = Random.Range(0.2f, 1f);
+            _colorVector.y = Random.Range(0.2f, 1f);
+            _colorVector.z = Random.Range(0.2f, 1f);
             yield return new WaitForSeconds(1f);
         }
+    }
+
+    private void SetVFXColor()
+    {
+        _vfx.SetVector4("Color2", _colorVector);
+        _vfx.SetVector4("Color", _colorVector);
     }
 }
