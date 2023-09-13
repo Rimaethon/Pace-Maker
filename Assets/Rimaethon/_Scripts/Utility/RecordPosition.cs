@@ -22,7 +22,6 @@ public class RecordPosition : MonoBehaviour
 
     private void Record()
     {
-        // Add current position to list only when Space button is pressed
         _positions.Add(transform.position);
     }
 
